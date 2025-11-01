@@ -1,7 +1,7 @@
 from PIL import Image, ImageFont, ImageDraw
 import colorsys
 
-from ..base import FilePath
+from ..base import FilePath, TalentType
 from ..model import UnitInfo
 from ..util import (
     convert2charid,
@@ -138,25 +138,24 @@ async def draw_fullcard(info: UnitInfo, unique_num=0):
     x, y = get_text_size(atk_type, font)
     text_base(
         base,
-        width * 0.95 - x / 2 - 119,
+        width * 0.95 - x / 2 - 141 / 2,
         height * 0.79,
         base_dict[atk_type],
-        target_width=200,
     )
-    draw.text((width * 0.89, height * 0.8), atk_type, font_colour, font, align="right")
+    draw.text((width * 0.92, height * 0.8), TalentType.get(info.talent).name, font_colour, font, align="right")
     atk_type_sign = Image.open(FilePath.icon.value / f"{atk_type}.png").copy()
     base.paste(
         atk_type_sign,
-        (int(width * 0.85), int(height * 0.8)),
+        (int(width * 0.885), int(height * 0.8)),
         mask=atk_type_sign,
     )
     type_ = search_type_distance2str(info.search_area_width)
     search_area_width = f"{info.search_area_width}"
     bbox = font.getbbox(search_area_width)
     x, y = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    text_base(base, width * 0.7, height * 0.79, base_dict[type_], target_width=180)
+    text_base(base, width * 0.73, height * 0.79, base_dict[type_], target_width=180)
     draw.text(
-        (width * 0.76, height * 0.8),
+        (width * 0.79, height * 0.8),
         search_area_width,
         font_colour,
         font,
@@ -170,7 +169,7 @@ async def draw_fullcard(info: UnitInfo, unique_num=0):
     )
     base.paste(
         sign,
-        (int(width * 0.7) + 20, int(height * 0.77) + 20),
+        (int(width * 0.73) + 20, int(height * 0.77) + 20),
         mask=sign,
     )
 

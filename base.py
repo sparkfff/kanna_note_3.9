@@ -357,7 +357,7 @@ class StringResources(Enum):
     SKILL_STATUS_PHYSICAL_ATK = "物理攻击"
     SKILL_STATUS_MAGIC_ATK = "魔法攻击"
     SKILL_AREA_EXCLUDE_SUMMON = "召唤物、分身除外"
-    SKILL_AREA_INCLUDE_SUMMON = "飞行单位在内"
+    SKILL_AREA_INCLUDE_FLIGHT = "飞行单位在内"
     SKILL_TARGET_NONE = "目标"
     SKILL_TARGET_2_8 = "随机"
     SKILL_TARGET_3 = "最近"
@@ -746,6 +746,7 @@ class Color(Enum):
     white = "#ffffff"
     purple = "#b476cd"
     pink = "#f8b1d7"
+    blue = "#3b5998"
 
 
 class CalendarEventType(Enum):
@@ -847,3 +848,61 @@ class BuffType(Enum):
     @property
     def name(self) -> str:
         return buff_type_name_duct.get(self.value, StringResources.UNKNOWN.value)
+
+class TalentType(Enum):
+    fire = "火"
+    water = "水"
+    wind = "风"
+    light = "光"
+    dark = "暗"
+    
+    @property
+    def name(self) -> str:
+        return self.value
+    
+    @property
+    def color(self) -> str:
+        if self == TalentType.fire:
+            return Color.red.value
+        elif self == TalentType.water:
+            return Color.blue.value
+        elif self == TalentType.wind:
+            return Color.green.value
+        elif self == TalentType.light:
+            return Color.gold.value
+        elif self == TalentType.dark:
+            return Color.purple.value
+        else:
+            return Color.black.value
+    
+    @property
+    def index(self) -> int:
+        if self == TalentType.fire:
+            return 1
+        elif self == TalentType.water:
+            return 2
+        elif self == TalentType.wind:
+            return 3
+        elif self == TalentType.light:
+            return 4
+        elif self == TalentType.dark:
+            return 5
+        else:
+            return 0
+    
+    @classmethod
+    def get(cls, index: int) -> "TalentType":
+        if index == 1:
+            return cls.fire
+        elif index == 2:
+            return cls.water
+        elif index == 3:
+            return cls.wind
+        elif index == 4:
+            return cls.light
+        elif index == 5:
+            return cls.dark
+        else:
+            return None
+        
+    

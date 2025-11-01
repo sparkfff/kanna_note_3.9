@@ -28,7 +28,7 @@ from .draw.draw_unit_unique_equipment import (
 
 from .draw.util import merge_pic
 
-from .table import UnitSkillData
+from .table import SkillData, UnitSkillData
 
 from .base import FilePath, GameSetting
 
@@ -243,7 +243,7 @@ async def get_chara_unique_equip(
                 [
                     getattr(skill_data_dict[skill], f"action_{i}")
                     for i in range(1, 10 + 1)
-                ]
+                ] if skill_data_dict[skill] else []
             )
         )
         for skill in skills["normal"] + skills["sp"]
@@ -295,16 +295,22 @@ async def get_chara_skill(id_: int, type_: str = None, data: PCRDatabase = None)
     )
     skill_dict, skill_type_dict = get_skill_ids(unit_skills)
     skill_data_dict = {
-        skill: await data.get_skill_data(
-            temp if (temp := await data.get_rf_skill_id(skill)) else skill
-        )
+        skill: await data.get_skill_data(skill)
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
+    skill_data_dict[1] = SkillData(
+            skill_id=1,
+            skill_name="普通攻击",
+            skill_type=unit_info.atk_type,
+            skill_cast_time= unit_info.normal_atk_cast_time,
+            description=""
+        ) # 普攻
+    
     skill_action_dict = {
         skill: await data.get_skill_actions(
             action_ids=[
                 getattr(skill_data_dict[skill], f"action_{i}") for i in range(1, 10 + 1)
-            ]
+            ] if skill_data_dict[skill] else []
         )
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
@@ -358,6 +364,8 @@ async def get_enemy_skill(
         main_parameter = await data.get_tower_enemy_parameter_query(enemy_id)
 
     unit_info = await data.get_enemy_info_query(main_parameter.unit_id)
+    talent_weakness = await data.get_enemy_weakness_query(main_parameter.enemy_id)
+    print(talent_weakness)
     attack_pattern = await data.get_attack_pattern(
         unit_info.cutin_star6 or unit_info.unit_id
     )
@@ -365,15 +373,23 @@ async def get_enemy_skill(
         unit_info.cutin_star6 or unit_info.unit_id
     )
     skill_dict, skill_type_dict = get_skill_ids(unit_skills)
+    
     skill_data_dict = {
         skill: await data.get_skill_data(skill)
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
+    skill_data_dict[1] = SkillData(
+            skill_id=1,
+            skill_name="普通攻击",
+            skill_type=unit_info.atk_type,
+            skill_cast_time= unit_info.normal_atk_cast_time,
+            description=""
+        ) # 普攻
     skill_action_dict = {
         skill: await data.get_skill_actions(
             action_ids=[
                 getattr(skill_data_dict[skill], f"action_{i}") for i in range(1, 10 + 1)
-            ]
+            ] if skill_data_dict[skill] else []
         )
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
@@ -408,6 +424,7 @@ async def get_enemy_skill(
                 await draw_enemy_introduce(
                     main_parameter,
                     sub_parameters,
+                    talent_weakness,
                     (
                         FilePath.font_ms_bold.value
                         if type_ != "jp"

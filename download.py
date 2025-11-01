@@ -17,7 +17,7 @@ async def update_pcr_database():
                 f.write(decompressor.process(chunk))
 
         os.replace(FilePath.temp_db.value, path)  # 替换文件
-    os.remove(FilePath.temp_db.value)  # 删除临时文件
+    # os.remove(FilePath.temp_db.value)  # 删除临时文件
 
 
 def generate_pcr_fullcard(id_, star):

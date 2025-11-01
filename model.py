@@ -24,6 +24,8 @@ class UnitInfo:
     birth_day_int: Optional[int] = None
     search_area_width: Optional[int] = None
     atk_type: Optional[int] = None
+    normal_atk_cast_time: Optional[float] = None
+    talent:int = 0
     intro: str = ""
     unit_start_time: str = ""
     actual_name: str = ""

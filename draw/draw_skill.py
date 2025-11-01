@@ -176,15 +176,18 @@ async def draw_single_skill(
     tags = {action.tag for action in desc[::-1] if action.tag}
     introduce = split_text(skill_data.description, 25)
     skill_text_max = 25
-    height = (
-        105
-        + 20 * len(introduce)
-        + 5  # 加点空隙
-        + 25
-        * sum(len(split_text(action.action_desc, skill_text_max)) for action in desc)
-        + 10 * len(desc)
-        - 10
-    )
+    if action_data:
+        height = (
+            105
+            + 20 * len(introduce)
+            + 5  # 加点空隙
+            + 25
+            * sum(len(split_text(action.action_desc, skill_text_max)) for action in desc)
+            + 10 * len(desc)
+            - 10
+        )
+    else:
+        height =70
 
     base = Image.new("RGBA", (WIDTH, height), "#fef8f8")
     draw = ImageDraw.Draw(base)
@@ -199,7 +202,7 @@ async def draw_single_skill(
     font_cn = ImageFont.truetype(FilePath.font_ms_bold.value, 15)
     font = ImageFont.truetype(text_font_path, 15)
     base.paste(
-        Image.open(await get_skill_icon(skill_data.icon_type))
+        Image.open(await get_skill_icon(skill_data.icon_type or 1))
         .convert("RGBA")
         .resize((50, 50)),
         (MARGIN, height),
@@ -227,18 +230,18 @@ async def draw_single_skill(
 
     temp_width = 0
     for tag in tags:
-        draw_text_with_base(
-            draw,
-            tag,
-            MARGIN + temp_width,
-            height,
-            font_cn,
-            "#ffffff",
-            "#a5366f",
-            margin=10,
-        )
-        x, _ = get_text_size(tag, font_cn)
-        temp_width += x + 15
+            draw_text_with_base(
+                draw,
+                tag,
+                MARGIN + temp_width,
+                height,
+                font_cn,
+                "#ffffff",
+                "#a5366f",
+                margin=10,
+            )
+            x, _ = get_text_size(tag, font_cn)
+            temp_width += x + 15
     height += 25
     draw.multiline_text(
         (MARGIN, height),

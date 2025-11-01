@@ -70,11 +70,11 @@ def get_skill_level(skill_data: UnitSkillData, parameter: EnemyParameter) -> dic
 
 def get_skill_ids(skill: UnitSkillData):
     skill_dict = {
-        "normal": [],
+        "normal": [1],
         "sp": [],
     }
 
-    skill_type_dict = {}
+    skill_type_dict = {1: "普通攻击"}
     if skill.union_burst:
         skill_dict["normal"].append(skill.union_burst)
         skill_type_dict[skill.union_burst] = "连结爆发"

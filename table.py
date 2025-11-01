@@ -1121,3 +1121,24 @@ class TowerEnemyParameter(PCRModel, table=True):
     resist_variation_id: int
     accuracy: int
     enemy_color: int
+
+class TalentWeakness(PCRModel, table=True):
+    __tablename__ = "talent_weakness"
+    resist_id: int = Field(primary_key=True)
+    talent_1: int
+    talent_2: int
+    talent_3: int
+    talent_4: int
+    talent_5: int
+
+class EnemyTalentWeakness(PCRModel, table=True):
+    __tablename__ = "enemy_talent_weakness"
+    enemy_id: int = Field(primary_key=True)
+    resist_id: int
+
+class UnitTalent(PCRModel, table=True):
+    __tablename__ = "unit_talent"
+    setting_id: int = Field(primary_key=True)
+    unit_id: int
+    talent_id: int
+
