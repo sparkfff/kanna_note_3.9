@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from .base import CalendarEventType, Color
+from .base import CalendarEventType, Color, TalentType
 
 
 @dataclass
@@ -25,7 +25,7 @@ class UnitInfo:
     search_area_width: Optional[int] = None
     atk_type: Optional[int] = None
     normal_atk_cast_time: Optional[float] = None
-    talent:int = 0
+    talent: int = 0
     intro: str = ""
     unit_start_time: str = ""
     actual_name: str = ""
@@ -221,15 +221,26 @@ class CalendarEvent:
         except Exception:
             type_int = 404
         event_type = CalendarEventType.get_by_value(type_int)
-
-        if event_type == CalendarEventType.TOWER:
-            events.append(CalendarEventData("露娜塔", "", ""))
-        elif event_type == CalendarEventType.SP_DUNGEON:
-            events.append(CalendarEventData("特殊地下城", "", ""))
-        elif event_type == CalendarEventType.TDF:
-            events.append(CalendarEventData("次元断层", "", ""))
-        elif event_type == CalendarEventType.COLOSSEUM:
-            events.append(CalendarEventData("斗技场", "", ""))
+        if event_type in [
+            CalendarEventType.TOWER,
+            CalendarEventType.SP_DUNGEON,
+            CalendarEventType.TDF,
+            CalendarEventType.COLOSSEUM,
+        ]:
+            events.append(CalendarEventData(event_type.title, "", ""))
+        elif event_type == CalendarEventType.ABYSS:
+            talent_id = self.value
+            if talent := TalentType.get(talent_id):
+                events.append(
+                    CalendarEventData(
+                        event_type.title,
+                        talent.name,
+                        " ",
+                        talent.color,
+                    )
+                )
+            else:
+                events.append(CalendarEventData(event_type.title, "", ""))
         else:
             try:
                 list_of_types = list(map(int, self.type.split("-")))
@@ -237,24 +248,6 @@ class CalendarEvent:
                 list_of_types = [self.type]
             for type_val in list_of_types:
                 event_enum = CalendarEventType.get_by_value(type_val)
-
-                title_map = {
-                    CalendarEventType.DAILY: "每日任务体力",
-                    CalendarEventType.LOGIN: "每日登录宝石奖励，共计",
-                    CalendarEventType.FORTUNE: "兰德索尔杯",
-                    CalendarEventType.N_DROP: "普通关卡",
-                    CalendarEventType.N_MANA: "普通关卡",
-                    CalendarEventType.H_DROP: "困难关卡",
-                    CalendarEventType.H_MANA: "困难关卡",
-                    CalendarEventType.VH_DROP: "高难关卡",
-                    CalendarEventType.VH_MANA: "高难关卡",
-                    CalendarEventType.EXPLORE: "探索",
-                    CalendarEventType.SHRINE: "圣迹调查",
-                    CalendarEventType.TEMPLE: "神殿调查",
-                    CalendarEventType.DUNGEON: "地下城",
-                }
-
-                title = title_map.get(event_enum, "")
 
                 multiple = self.value / 1000.0
                 if multiple in [1.5, 2.0]:
@@ -287,7 +280,9 @@ class CalendarEvent:
                 ]:
                     info = "玛那掉落量" if type_val > 40 else "掉落量"
 
-                events.append(CalendarEventData(title, mult_text, info, drop_color))
+                events.append(
+                    CalendarEventData(event_enum.title, mult_text, info, drop_color)
+                )
 
         return events
 

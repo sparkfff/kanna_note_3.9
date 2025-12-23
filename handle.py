@@ -15,7 +15,7 @@ from .draw.draw_event import (
     draw_free_gacha_event,
     draw_gacha_event,
     draw_story_event,
-    drwa_calendar_event,
+    draw_calendar_event,
 )
 
 from .draw.draw_clan_battle_info import draw_clan_info
@@ -50,7 +50,6 @@ from .util import (
     convert2simplified,
     is_coming_soon,
     is_in_progress,
-    is_text_chinese,
     pic2cqcode,
 )
 from .draw.draw_fullcard import draw_fullcard
@@ -243,7 +242,9 @@ async def get_chara_unique_equip(
                 [
                     getattr(skill_data_dict[skill], f"action_{i}")
                     for i in range(1, 10 + 1)
-                ] if skill_data_dict[skill] else []
+                ]
+                if skill_data_dict[skill]
+                else []
             )
         )
         for skill in skills["normal"] + skills["sp"]
@@ -299,18 +300,23 @@ async def get_chara_skill(id_: int, type_: str = None, data: PCRDatabase = None)
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
     skill_data_dict[1] = SkillData(
-            skill_id=1,
-            skill_name="普通攻击",
-            skill_type=unit_info.atk_type,
-            skill_cast_time= unit_info.normal_atk_cast_time,
-            description=""
-        ) # 普攻
-    
+        skill_id=1,
+        skill_name="普通攻击",
+        skill_type=unit_info.atk_type,
+        skill_cast_time=unit_info.normal_atk_cast_time,
+        description="",
+    )  # 普攻
+
     skill_action_dict = {
         skill: await data.get_skill_actions(
-            action_ids=[
-                getattr(skill_data_dict[skill], f"action_{i}") for i in range(1, 10 + 1)
-            ] if skill_data_dict[skill] else []
+            action_ids=(
+                [
+                    getattr(skill_data_dict[skill], f"action_{i}")
+                    for i in range(1, 10 + 1)
+                ]
+                if skill_data_dict[skill]
+                else []
+            )
         )
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
@@ -373,23 +379,28 @@ async def get_enemy_skill(
         unit_info.cutin_star6 or unit_info.unit_id
     )
     skill_dict, skill_type_dict = get_skill_ids(unit_skills)
-    
+
     skill_data_dict = {
         skill: await data.get_skill_data(skill)
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
     skill_data_dict[1] = SkillData(
-            skill_id=1,
-            skill_name="普通攻击",
-            skill_type=unit_info.atk_type,
-            skill_cast_time= unit_info.normal_atk_cast_time,
-            description=""
-        ) # 普攻
+        skill_id=1,
+        skill_name="普通攻击",
+        skill_type=unit_info.atk_type,
+        skill_cast_time=unit_info.normal_atk_cast_time,
+        description="",
+    )  # 普攻
     skill_action_dict = {
         skill: await data.get_skill_actions(
-            action_ids=[
-                getattr(skill_data_dict[skill], f"action_{i}") for i in range(1, 10 + 1)
-            ] if skill_data_dict[skill] else []
+            action_ids=(
+                [
+                    getattr(skill_data_dict[skill], f"action_{i}")
+                    for i in range(1, 10 + 1)
+                ]
+                if skill_data_dict[skill]
+                else []
+            )
         )
         for skill in skill_dict["normal"] + skill_dict["sp"]
     }
@@ -555,6 +566,7 @@ async def get_schedule(type_: str = None, data: PCRDatabase = None):
 
     calendar_event_list = (
         await data.get_all_events()
+        + await data.get_abyss_event()
         + await data.get_free_gacha_event()
         + await data.get_gacha_history()
         + await data.get_drop_event()
@@ -565,11 +577,8 @@ async def get_schedule(type_: str = None, data: PCRDatabase = None):
         + await data.get_sp_dungeon_event()
         + await data.get_fault_event()
         + await data.get_all_clan_battle_data()
+        + await data.get_colosseum_event()
     )
-    try:
-        calendar_event_list += await data.get_colosseum_event()
-    except Exception as e:
-        logger.warning(f"获取斗技场事件失败: {e}")
 
     is_fix_jp = type_ == "jp"
     in_progress_list, coming_soon_list = fliter_event_list(
@@ -595,7 +604,7 @@ async def get_schedule(type_: str = None, data: PCRDatabase = None):
         elif isinstance(event, ClanBattleData):
             img_list.append(await draw_clan_battle_event(event))
         elif isinstance(event, CalendarEvent):
-            img_list.append(await drwa_calendar_event(event))
+            img_list.append(await draw_calendar_event(event))
         elif isinstance(event, GachaHistoryData):
             unit_dict = {
                 unit_id: (await data.get_unit_info_query(int(unit_id)))

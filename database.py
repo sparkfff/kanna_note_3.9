@@ -49,6 +49,7 @@ from .table import (
     TdfSchedule,
     TowerEnemyParameter,
     TowerSchedule,
+    AbyssSchedule,
     UniqueEquipmentEnhanceData,
     UnitAttackPattern,
     UnitData,
@@ -236,10 +237,7 @@ class PCRDatabase:
                 ((UnitData.unit_id // 100) == (ActualUnitBackground.unit_id // 100)),
                 isouter=True,
             )
-            .join(
-                UnitTalent, 
-                UnitTalent.unit_id == UnitProfile.unit_id)
-            
+            .join(UnitTalent, UnitTalent.unit_id == UnitProfile.unit_id)
             .where(UnitData.unit_id == unit_id)
         )
         result = await session.execute(query)
@@ -260,13 +258,18 @@ class PCRDatabase:
             select(UnitEnemyData).where(UnitEnemyData.unit_id == enemy_id)
         )
         return result.scalars().first()
-    
+
     @session
     async def get_enemy_weakness_query(
         self, session: AsyncSession, enemy_id: int
     ) -> Optional[TalentWeakness]:
         result = await session.execute(
-            select(TalentWeakness).join(EnemyTalentWeakness, TalentWeakness.resist_id == EnemyTalentWeakness.resist_id).where(EnemyTalentWeakness.enemy_id == enemy_id)
+            select(TalentWeakness)
+            .join(
+                EnemyTalentWeakness,
+                TalentWeakness.resist_id == EnemyTalentWeakness.resist_id,
+            )
+            .where(EnemyTalentWeakness.enemy_id == enemy_id)
         )
         return result.scalars().first()
 
@@ -1022,6 +1025,7 @@ class PCRDatabase:
                 CampaignSchedule.campaign_category.in_(
                     [31, 41, 32, 42, 39, 49, 34, 37, 38, 45]
                 ),
+                CampaignSchedule.lv_to == -1,
             )
             .group_by(
                 CampaignSchedule.start_time,
@@ -1197,6 +1201,28 @@ class PCRDatabase:
             return []
 
     @session
+    async def get_abyss_event(self, session: AsyncSession, limit: int = 1):
+
+        query = (
+            select(
+                literal(-4).label("type"),
+                AbyssSchedule.talent_id.label("value"),
+                AbyssSchedule.start_time,
+                AbyssSchedule.end_time,
+            )
+            .order_by(AbyssSchedule.abyss_id.desc())
+            .limit(limit)
+        )
+        result = await session.execute(query)
+        if result := result.fetchall():
+            return [
+                CalendarEvent(**dict(zip(CalendarEvent.__annotations__.keys(), item)))
+                for item in result
+            ]
+        else:
+            return []
+
+    @session
     async def get_free_gacha_event(self, session: AsyncSession, limit: int = 1):
         a = alias(CampaignFreegacha)
         b = alias(CampaignFreegacha)
@@ -1229,7 +1255,6 @@ class PCRDatabase:
 
     @session
     async def get_colosseum_event(self, session: AsyncSession, limit: int = 1):
-
         query = (
             select(
                 literal(-3).label("type"),

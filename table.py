@@ -711,6 +711,16 @@ class TowerSchedule(PCRModel, table=True):
     end_time: str
 
 
+class AbyssSchedule(PCRModel, table=True):
+    __tablename__ = "abyss_schedule"
+
+    abyss_id: int = Field(primary_key=True)
+    talent_id: int
+    title: str
+    start_time: str
+    end_time: str
+
+
 class ShioriEventList(PCRModel, table=True):
     __tablename__ = "shiori_event_list"
 
@@ -1122,6 +1132,7 @@ class TowerEnemyParameter(PCRModel, table=True):
     accuracy: int
     enemy_color: int
 
+
 class TalentWeakness(PCRModel, table=True):
     __tablename__ = "talent_weakness"
     resist_id: int = Field(primary_key=True)
@@ -1131,14 +1142,15 @@ class TalentWeakness(PCRModel, table=True):
     talent_4: int
     talent_5: int
 
+
 class EnemyTalentWeakness(PCRModel, table=True):
     __tablename__ = "enemy_talent_weakness"
     enemy_id: int = Field(primary_key=True)
     resist_id: int
+
 
 class UnitTalent(PCRModel, table=True):
     __tablename__ = "unit_talent"
     setting_id: int = Field(primary_key=True)
     unit_id: int
     talent_id: int
-

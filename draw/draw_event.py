@@ -151,7 +151,7 @@ def draw_event_banner(
 
 async def draw_story_event(event: EventData, type_: str) -> Image.Image:
     title = event.title.replace(" ", "").replace("\\n", "")
-    title_list = split_text(title, 10)
+    title_list = split_text(title, 13)
     icon_height = int((WIDTH - 2 * MARGIN) * 0.42)
     height = icon_height + 100 + len(title_list) * 35
     icon = (
@@ -220,7 +220,7 @@ async def draw_story_event(event: EventData, type_: str) -> Image.Image:
     return base
 
 
-async def drwa_calendar_event(event: CalendarEvent):
+async def draw_calendar_event(event: CalendarEvent):
     event_list = event.get_event_list()
     height = len(event_list) * 30 + 60
     base = Image.new("RGBA", (WIDTH, height), "#fef8f8")

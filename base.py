@@ -391,7 +391,9 @@ class StringResources(Enum):
     SKILL_TARGET_44 = "剩余HP最低(自身除外)"
     SKILL_TARGET_45 = "物理防御力最低"
     SKILL_TARGET_46 = "魔法防御力最低"
+    SKILL_TARGET_47 = "飞行状态"
     SKILL_TARGET_50 = "魔法攻击力最高(自身除外)"
+    SKILL_TARGET_51 = "物理攻击力最高(自身和魔法角色除外)"
     SKILL_TARGET_13XXX = "被标记"
     SKILL_TARGET_FIRE = "火天赋"
     SKILL_TARGET_WATER = "水天赋"
@@ -446,7 +448,7 @@ class StringResources(Enum):
     SKILL_CRITICAL_DAMAGE_MULTIPLE = "；暴击时，造成 {}{} 倍伤害"
     SKILL_MUST_CRITICAL = "；必定暴击"
     SKILL_IGNORE_DEF = "；无视目标{}{}防御力 "
-    SKILL_ACTION_TYPE_DESC_1 = "对{}造成 {} 的{}伤害{}{}{}{}"
+    SKILL_ACTION_TYPE_DESC_1 = "对{}造成 {} 的{}伤害{}{}{}{}{}"
     SKILL_FORWARD = "向前"
     SKILL_BACKWARD = "向后"
     SKILL_AHEAD = "前方"
@@ -468,7 +470,7 @@ class StringResources(Enum):
     SKILL_ACTION_TYPE_DESC_8 = "使{}进入 [{}] 状态{}{}"
     SKILL_ACTION_HIT_REMOVE = "，本效果将会在受到伤害时解除"
     SKILL_ACTION_DOT_INCREASE = "，伤害每秒增加基础数值的 [{}%]"
-    SKILL_ACTION_TYPE_DESC_9 = "使{}进入{}状态，每秒造成伤害 {}{}{}"
+    SKILL_ACTION_TYPE_DESC_9 = "使{}进入{}状态，每秒造成伤害 {}{}{}{}"
     SKILL_BUFF = "增益"
     SKILL_DEBUFF = "减益"
     SKILL_BARRIER = "护盾"
@@ -570,7 +572,9 @@ class StringResources(Enum):
     SKILL_ACTION_TYPE_DESC_29 = "无 UB 技能"
     SKILL_ACTION_TYPE_DESC_30 = "{}死亡"
     SKILL_ACTION_TYPE_DESC_32 = "为{}的下 [{}] 次攻击附加{} {} 的效果"
-    SKILL_ACTION_TYPE_DESC_33 = "{}，受到{}伤害时反弹 {} 伤害{}，生效 [{}] 次"
+    SKILL_ACTION_TYPE_DESC_33 = "{}，受到{}伤害时{}{}，生效 [{}] 次"
+    SKILL_ACTION_TYPE_DESC_33_VALUE = "反弹 {} 伤害{}"
+    SKILL_ACTION_TYPE_DESC_33_ACTION = "使用动作({})"
     SKILL_ACTION_TYPE_DESC_33_HP = "，并回复HP"
     SKILL_ACTION_TYPE_DESC_34 = "每次攻击当前的目标，将会追加伤害 {}{}"
     SKILL_ACTION_TYPE_DESC_35 = "对{}追加 [{}] 层标记{}{}"
@@ -629,7 +633,7 @@ class StringResources(Enum):
     SKILL_ACTION_TYPE_DESC_77_1 = "受到"
     SKILL_ACTION_TYPE_DESC_78 = "使{}受到的伤害额外{} {} 倍{}{}"
     SKILL_ACTION_TYPE_DESC_78_1 = "减益和异常状态数量"
-    SKILL_ACTION_TYPE_DESC_79 = "{}行动时，受到{} {} 伤害{}{}"
+    SKILL_ACTION_TYPE_DESC_79 = "{}行动时，受到{} {} 伤害{}{}{}"
     SKILL_ACTION_TYPE_DESC_81 = "{}变更为无法被攻击的目标"
     SKILL_ACTION_TYPE_DESC_90 = "{}{}提升 {}"
     SKILL_ACTION_TYPE_DESC_901 = "战斗开始时生效"
@@ -666,6 +670,8 @@ class StringResources(Enum):
         "使{}受到的 {} 伤害转化为持续伤害{}；该持续伤害不回复 TP"
     )
     SKILL_ACTION_TYPE_DESC_130 = "使{}受到伤害时，按物理/魔法防御中较高的防御计算伤害"
+    SKILL_ACTION_TAKE_DAMAGE_TP_0 = "，受击时不回复 TP"
+    SKILL_ACTION_TAKE_DAMAGE_TP_MULTIPLE = "，受击 TP 变更为初始值的 [{}] 倍"
     SKILL_AILMENT_1 = "减速"
     SKILL_AILMENT_2 = "加速"
     SKILL_AILMENT_3 = "麻痹"
@@ -755,6 +761,7 @@ class CalendarEventType(Enum):
     SP_DUNGEON = -1
     TDF = -2
     COLOSSEUM = -3
+    ABYSS = -4
     DAILY = 18
     LOGIN = 19
     FORTUNE = 20
@@ -768,6 +775,47 @@ class CalendarEventType(Enum):
     SHRINE = 37
     TEMPLE = 38
     DUNGEON = 45
+
+    @property
+    def title(self) -> str:
+        if self == CalendarEventType.UNKNOWN:
+            return "未知"
+        if self == CalendarEventType.TOWER:
+            return "露娜塔"
+        if self == CalendarEventType.SP_DUNGEON:
+            return "特别地下城"
+        if self == CalendarEventType.TDF:
+            return "次元断层"
+        if self == CalendarEventType.COLOSSEUM:
+            return "斗技场"
+        if self == CalendarEventType.ABYSS:
+            return "深渊讨伐战"
+        if self == CalendarEventType.DAILY:
+            return "每日任务体力"
+        if self == CalendarEventType.LOGIN:
+            return "每日登录宝石奖励，共计"
+        if self == CalendarEventType.FORTUNE:
+            return "兰德索尔杯"
+        if self == CalendarEventType.N_DROP:
+            return "普通关卡"
+        if self == CalendarEventType.N_MANA:
+            return "普通关卡"
+        if self == CalendarEventType.H_DROP:
+            return "困难关卡"
+        if self == CalendarEventType.H_MANA:
+            return "困难关卡"
+        if self == CalendarEventType.VH_DROP:
+            return "高难关卡"
+        if self == CalendarEventType.VH_MANA:
+            return "高难关卡"
+        if self == CalendarEventType.EXPLORE:
+            return "探索"
+        if self == CalendarEventType.SHRINE:
+            return "圣迹调查"
+        if self == CalendarEventType.TEMPLE:
+            return "神殿调查"
+        if self == CalendarEventType.DUNGEON:
+            return "地下城"
 
     @classmethod
     def get_by_value(cls, value: int) -> "CalendarEventType":
@@ -849,17 +897,18 @@ class BuffType(Enum):
     def name(self) -> str:
         return buff_type_name_duct.get(self.value, StringResources.UNKNOWN.value)
 
+
 class TalentType(Enum):
     fire = "火"
     water = "水"
     wind = "风"
     light = "光"
     dark = "暗"
-    
+
     @property
     def name(self) -> str:
         return self.value
-    
+
     @property
     def color(self) -> str:
         if self == TalentType.fire:
@@ -874,7 +923,7 @@ class TalentType(Enum):
             return Color.purple.value
         else:
             return Color.black.value
-    
+
     @property
     def index(self) -> int:
         if self == TalentType.fire:
@@ -889,7 +938,7 @@ class TalentType(Enum):
             return 5
         else:
             return 0
-    
+
     @classmethod
     def get(cls, index: int) -> "TalentType":
         if index == 1:
@@ -904,5 +953,3 @@ class TalentType(Enum):
             return cls.dark
         else:
             return None
-        
-    

@@ -282,9 +282,7 @@ def get_atk_type(action_detail_1: int) -> str:
     elif action_detail_1 == 4:
         return "必定命中的魔法"
     elif action_detail_1 == 5:
-        return "(物理、魔法攻击力合计)物理"
-    elif action_detail_1 == 6:
-        return "(物理、魔法攻击力合计)魔法"
+        return "(依据目标较低的防御改变伤害类型)"
     else:
         return "未知"
 
@@ -634,7 +632,15 @@ class ActionHandler:
 
     # 90：EX被动
     def ex(self):
-        type_ = BuffType.get(self.action.action_detail_1).name
+        type_ = {
+            1: StringResources.ATTR_HP,
+            2: StringResources.ATTR_ATK,
+            3: StringResources.ATTR_DEF,
+            4: StringResources.ATTR_MAGIC_STR,
+            5: StringResources.ATTR_MAGIC_DEF,
+            6: StringResources.ATTR_PHYSICAL_CRITICAL,
+            7: StringResources.ATTR_MAGIC_CRITICAL,
+        }.get(self.action.action_detail_1, StringResources.get("unknown"))
 
         value = self.get_value_text(
             2, self.action.action_value_2, self.action.action_value_3
@@ -906,6 +912,16 @@ class ActionHandler:
     def limit_attack(self):
         return StringResources.get("skill_action_type_desc_47")
 
+    def take_damage_tp(self):
+        if self.action.action_detail_3 == 0:
+            return ""
+        multiple = 1 - self.action.action_detail_3 / 100
+        return (
+            StringResources.get("skill_action_take_damage_tp_0")
+            if multiple == 0
+            else StringResources.get("skill_action_take_damage_tp_multiple", multiple)
+        )
+
     def skill_count(self):
         return StringResources.get(
             "skill_action_type_desc_45",
@@ -932,11 +948,12 @@ class ActionHandler:
         damage = StringResources.get(
             "skill_action_type_desc_36_damage", value, atk_type
         )
+        tp = self.take_damage_tp()
         return StringResources.get(
             "skill_action_type_desc_field",
             self.action.action_value_7,
             damage,
-            time,
+            tp + time,
         )
 
     # 37：治疗领域展开
@@ -1145,7 +1162,8 @@ class ActionHandler:
                 "skill_action_type_desc_46_3", self.get_target(), value
             ),
         }.get(self.action.action_detail_1, "UNKNOWN")
-        return result + (limit if self.action.action_value_3 != 0.0 else "")
+        tp = self.take_damage_tp()
+        return result + (limit if self.action.action_value_3 != 0.0 else "") + tp
 
     # 34、102：伤害递增
     def accumulative_damage(self):
@@ -1180,12 +1198,18 @@ class ActionHandler:
             6: StringResources.get("skill_action_type_desc_33_hp"),
         }.get(self.action.action_detail_1, "")
 
+        if self.action.action_value_3 != 0:
+            action = StringResources.get(
+                "skill_action_type_desc_33_action", self.action.action_detail_3 % 100
+            )
+        else:
+            action = StringResources.get("skill_action_type_desc_33_value", value)
         if self.action.action_detail_1 <= 6:
             return StringResources.get(
                 "skill_action_type_desc_33",
                 shield_text,
                 back_type,
-                value,
+                action,
                 hp_recovery,
                 self.action.action_value_3,
             )
@@ -2105,12 +2129,15 @@ class ActionHandler:
             else ""
         )
 
+        tp = self.take_damage_tp()
+
         return StringResources.get(
             "skill_action_type_desc_9",
             self.get_target(),
             self.tag,
             value,
             dot_increase,
+            tp,
             time,
         )
 
@@ -2163,9 +2190,15 @@ class ActionHandler:
         else:
             type_ = ""
             limit = ""
-
+        tp = self.take_damage_tp()
         return StringResources.get(
-            "skill_action_type_desc_79", self.get_target(), type_, value, time, limit
+            "skill_action_type_desc_79",
+            self.get_target(),
+            type_,
+            value,
+            time,
+            tp,
+            limit,
         )
 
     # 8：行动速度变更、83：可叠加行动速度变更、99：范围速度变更
@@ -2413,6 +2446,8 @@ class ActionHandler:
             v4=self.action.action_value_4,
         )
 
+        tp = self.take_damage_tp()
+
         return StringResources.get(
             "skill_action_type_desc_1",
             self.get_target(),
@@ -2422,6 +2457,7 @@ class ActionHandler:
             multiple_damage,
             must_critical,
             ignore_def,
+            tp,
         )
 
     # 125：无法选中
@@ -2645,8 +2681,12 @@ class ActionHandler:
             target = StringResources.get("skill_target_45")
         elif self.action.target_type == 46:
             target = StringResources.get("skill_target_46")
+        elif self.action.target_type == 47:
+            target = StringResources.get("skill_target_47")
         elif self.action.target_type == 50:
             target = StringResources.get("skill_target_50")
+        elif self.action.target_type == 51:
+            target = StringResources.get("skill_target_51")
         elif 13195 <= self.action.target_type <= 14000:
             target = StringResources.get("skill_target_13xxx")
         elif self.action.target_type in [14001, 15001]:
