@@ -633,13 +633,13 @@ class ActionHandler:
     # 90：EX被动
     def ex(self):
         type_ = {
-            1: StringResources.ATTR_HP,
-            2: StringResources.ATTR_ATK,
-            3: StringResources.ATTR_DEF,
-            4: StringResources.ATTR_MAGIC_STR,
-            5: StringResources.ATTR_MAGIC_DEF,
-            6: StringResources.ATTR_PHYSICAL_CRITICAL,
-            7: StringResources.ATTR_MAGIC_CRITICAL,
+            1: StringResources.ATTR_HP.value,
+            2: StringResources.ATTR_ATK.value,
+            3: StringResources.ATTR_DEF.value,
+            4: StringResources.ATTR_MAGIC_STR.value,
+            5: StringResources.ATTR_MAGIC_DEF.value,
+            6: StringResources.ATTR_PHYSICAL_CRITICAL.value,
+            7: StringResources.ATTR_MAGIC_CRITICAL.value,
         }.get(self.action.action_detail_1, StringResources.get("unknown"))
 
         value = self.get_value_text(

@@ -38,6 +38,7 @@ from .table import (
     MissionRewardData,
     RedeemUnit,
     SecretDungeonSchedule,
+    SevenEnemyParameter,
     ShioriEnemyParameter,
     ShioriEventList,
     SkillAction,
@@ -290,6 +291,15 @@ class PCRDatabase:
             select(TalentQuestEnemyParameter).where(
                 TalentQuestEnemyParameter.enemy_id == enemy_id
             )
+        )
+        return result.scalars().first()
+
+    @session
+    async def get_seven_enemy_parameter_query(
+        self, session: AsyncSession, enemy_id: int
+    ) -> SevenEnemyParameter:
+        result = await session.execute(
+            select(SevenEnemyParameter).where(SevenEnemyParameter.enemy_id == enemy_id)
         )
         return result.scalars().first()
 

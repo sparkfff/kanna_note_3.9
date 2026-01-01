@@ -1,3 +1,4 @@
+import contextlib
 from datetime import datetime
 from functools import wraps
 
@@ -360,7 +361,10 @@ async def get_enemy_skill(
     # TODO: main_parameter 有不同种类，目前他们的字段是大部分一样的，可以用继承简化，同时type hint有点问题
     if not (main_parameter := await data.get_enemy_parameter_query(enemy_id)):
         main_parameter = await data.get_talent_quest_enemy_parameter_query(enemy_id)
-    if not main_parameter:
+    with contextlib.suppress(Exception):
+        if not main_parameter:
+            main_parameter = await data.get_seven_enemy_parameter_query(enemy_id)
+    """if not main_parameter:
         main_parameter = await data.get_event_enemy_parameter_query(enemy_id)
     if not main_parameter:
         main_parameter = await data.get_shiori_enemy_parameter_query(enemy_id)
@@ -368,10 +372,9 @@ async def get_enemy_skill(
         main_parameter = await data.get_sre_enemy_parameter_query(enemy_id)
     if not main_parameter:
         main_parameter = await data.get_tower_enemy_parameter_query(enemy_id)
-
+"""
     unit_info = await data.get_enemy_info_query(main_parameter.unit_id)
     talent_weakness = await data.get_enemy_weakness_query(main_parameter.enemy_id)
-    print(talent_weakness)
     attack_pattern = await data.get_attack_pattern(
         unit_info.cutin_star6 or unit_info.unit_id
     )

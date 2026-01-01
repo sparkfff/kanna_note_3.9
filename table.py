@@ -1087,6 +1087,54 @@ class SreEnemyParameter(PCRModel, table=True):
     virtual_hp: int
 
 
+class SevenEnemyParameter(PCRModel, table=True):
+    __tablename__ = "seven_enemy_parameter"
+    enemy_id: int = Field(primary_key=True)
+    unit_id: int
+    name: str
+    level: int
+    rarity: int
+    promotion_level: int
+    hp: int
+    atk: int
+    magic_str: int
+    def_: float = Field(sa_column=Column("def", Float))
+    magic_def: int
+    physical_critical: int
+    magic_critical: int
+    wave_hp_recovery: int
+    wave_energy_recovery: int
+    dodge: int
+    physical_penetrate: int
+    magic_penetrate: int
+    life_steal: int
+    hp_recovery_rate: int
+    energy_recovery_rate: int
+    energy_reduce_rate: int
+    union_burst_level: int
+    main_skill_lv_1: int
+    main_skill_lv_2: int
+    main_skill_lv_3: int
+    main_skill_lv_4: int
+    main_skill_lv_5: int
+    main_skill_lv_6: int
+    main_skill_lv_7: int
+    main_skill_lv_8: int
+    main_skill_lv_9: int
+    main_skill_lv_10: int
+    ex_skill_lv_1: int
+    ex_skill_lv_2: int
+    ex_skill_lv_3: int
+    ex_skill_lv_4: int
+    ex_skill_lv_5: int
+    resist_status_id: int
+    resist_variation_id: int
+    accuracy: int
+    break_durability: int
+    unique_equipment_flag_1: int
+    virtual_hp: int
+
+
 class TowerEnemyParameter(PCRModel, table=True):
     __tablename__ = "tower_enemy_parameter"
     enemy_id: int = Field(primary_key=True)
