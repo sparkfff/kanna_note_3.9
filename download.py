@@ -1,23 +1,73 @@
 from io import BytesIO
 import os
+import asyncio
 from .base import FetchUrl, FilePath
 import brotli
 from .util import download_stream
 import httpx
+from .database import cn_data, jp_data, tw_data
+import logging
 
+logger = logging.getLogger(__name__)
 
 async def update_pcr_database():
-    for url, path in zip(
-        (FetchUrl.jp_url.value, FetchUrl.tw_url.value, FetchUrl.cn_url.value),
-        (FilePath.jp_db.value, FilePath.tw_db.value, FilePath.cn_db.value),
-    ):
-        decompressor = brotli.Decompressor()
-        with open(FilePath.temp_db.value, "wb") as f:
-            async for chunk in download_stream(url):
-                f.write(decompressor.process(chunk))
-
-        os.replace(FilePath.temp_db.value, path)  # 替换文件
-    # os.remove(FilePath.temp_db.value)  # 删除临时文件
+    """更新PCR数据库文件 - 修复版本"""
+    # 配置数据库更新参数
+    db_configs = [
+        (FetchUrl.cn_url.value, FilePath.cn_db.value, cn_data, "国服"),
+        (FetchUrl.jp_url.value, FilePath.jp_db.value, jp_data, "日服"),
+        (FetchUrl.tw_url.value, FilePath.tw_db.value, tw_data, "台服"),
+    ]
+    
+    success_count = 0
+    
+    for url, path, db_instance, server_name in db_configs:
+        logger.info(f"开始更新{server_name}数据库...")
+        
+        try:
+            # 步骤1: 关闭数据库连接
+            logger.info(f"关闭{server_name}数据库连接...")
+            await db_instance.engine.dispose()
+            
+            # 等待连接释放
+            await asyncio.sleep(2)
+            
+            # 步骤2: 下载新数据库到临时文件
+            logger.info(f"下载{server_name}数据库文件...")
+            decompressor = brotli.Decompressor()
+            with open(FilePath.temp_db.value, "wb") as f:
+                async for chunk in download_stream(url):
+                    f.write(decompressor.process(chunk))
+            
+            # 步骤3: 安全替换文件
+            logger.info(f"替换{server_name}数据库文件...")
+            if os.path.exists(path):
+                os.remove(path)
+            os.rename(FilePath.temp_db.value, path)
+            
+            # 步骤4: 重新初始化数据库
+            logger.info(f"重新初始化{server_name}数据库...")
+            await db_instance.init()
+            
+            success_count += 1
+            logger.info(f"{server_name}数据库更新成功")
+            
+        except PermissionError as e:
+            logger.error(f"{server_name}数据库更新失败: 权限错误 - {e}")
+            # 清理临时文件
+            if os.path.exists(FilePath.temp_db.value):
+                os.remove(FilePath.temp_db.value)
+            continue
+            
+        except Exception as e:
+            logger.error(f"{server_name}数据库更新失败: {e}")
+            # 清理临时文件
+            if os.path.exists(FilePath.temp_db.value):
+                os.remove(FilePath.temp_db.value)
+            continue
+    
+    logger.info(f"数据库更新完成，成功更新 {success_count}/{len(db_configs)} 个数据库")
+    return success_count
 
 
 def generate_pcr_fullcard(id_, star):
