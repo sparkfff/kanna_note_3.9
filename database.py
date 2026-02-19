@@ -1,3 +1,4 @@
+from __future__ import annotations
 from ast import List
 import datetime
 from functools import wraps
@@ -5,11 +6,8 @@ from typing import (
     Any,
     Awaitable,
     Callable,
-    Concatenate,
     Optional,
-    ParamSpec,
     TypeVar,
-    overload,
 )
 
 from sqlalchemy.future import select
@@ -98,18 +96,8 @@ from .model import (
 )
 
 T = TypeVar("T")
-P = ParamSpec("P")
 
-
-@overload
-def session(
-    func: Callable[Concatenate[Any, "AsyncSession", P], Awaitable[T]],
-) -> Callable[Concatenate[Any, P], Awaitable[T]]: ...
-
-
-def session(
-    func: Callable[Concatenate[Any, AsyncSession, P], Awaitable[T]],
-) -> Callable[Concatenate[Any, P], Awaitable[T]]:
+def session(func):
     @wraps(func)
     async def wrapper(self, *args, **kwargs):
         async with self.async_session() as _session:
