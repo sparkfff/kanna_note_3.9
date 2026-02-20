@@ -344,6 +344,13 @@ def get_buff_text(value, value_text="", action_value_7=0):
     return buff_text + change_desc
 
 
+def get_effect_type(value: int) -> str:
+    return {
+        1: StringResources.get("skill_action_type_desc_additive"),
+        2: StringResources.get("skill_action_type_desc_subtract"),
+    }.get(value, StringResources.get("unknown"))
+
+
 def get_status(value, action_value_3):
     return {
         100: StringResources.get("skill_status_100"),
@@ -499,6 +506,8 @@ class ActionHandler:
             SkillActionType.BUFF_DOT.value: self.buff_dot,
             SkillActionType.DAMAGE_TO_DOT.value: self.damage2dot,
             SkillActionType.CHANGE_DEF_MAX.value: self.change_def_max,
+            SkillActionType.DAMAGE_CHANGE.value: self.damage_change,
+            SkillActionType.SEAL_CONSUME.value: self.seal_consume,
         }
 
     def format_desc(
@@ -682,10 +691,7 @@ class ActionHandler:
             self.action.action_detail_1, StringResources.get("unknown")
         )
         # 增加或减少
-        effect_type = {
-            1: StringResources.get("skill_action_type_desc_additive"),
-            2: StringResources.get("skill_action_type_desc_subtract"),
-        }.get(self.action.action_detail_2, StringResources.get("unknown"))
+        effect_type = self.get_effect_type(self.action.action_detail_2)
         # 倍数计算公式
         value_text = f"<{self.action.action_value_1} * {count_type}>"
         return StringResources.get(
@@ -2487,6 +2493,40 @@ class ActionHandler:
         return StringResources.get(
             "skill_action_type_desc_130",
             self.get_target(),
+        )
+
+    # 132：伤害变更
+    def damage_change(self):
+        value = self.get_value_text(
+            1,
+            self.action.action_value_1,
+            self.action.action_value_2,
+            percent="%",
+        )
+        limit = StringResources.get(
+            "skill_action_damage_limit_int", self.action.action_value_3
+        )
+        effect_type = self.get_effect_type(self.action.action_detail_1)
+        time = self.get_time_text(4, self.action.action_value_4)
+        return StringResources.get(
+            "skill_action_type_desc_132",
+            self.get_target(),
+            effect_type,
+            value,
+            time,
+            limit,
+        )
+
+    # 133：标记消耗
+    def seal_consume(self):
+        action1 = self.action.action_detail_1 % 100
+        time = self.get_time_text(4, self.action.action_value_4, hide_index=True)
+        return StringResources.get(
+            "skill_action_type_desc_133",
+            self.get_target(),
+            int(self.action.action_value_2),
+            action1,
+            time,
         )
 
     def get_value_text(

@@ -580,7 +580,7 @@ async def get_schedule(type_: str = None, data: PCRDatabase = None):
         + await data.get_sp_dungeon_event()
         + await data.get_fault_event()
         + await data.get_all_clan_battle_data()
-        + await data.get_colosseum_event()
+        + await data.get_dome_event()
     )
 
     is_fix_jp = type_ == "jp"
