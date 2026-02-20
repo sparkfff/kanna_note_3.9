@@ -22,6 +22,7 @@ from .table import (
     CharaFortuneSchedule,
     ClanBattle2MapData,
     ClanBattleSchedule,
+    ColosseumScheduleData,
     DomeScheduleData,
     DailyMissionData,
     EnemyMParts,
@@ -1265,18 +1266,31 @@ class PCRDatabase:
 
     @session
     async def get_dome_event(self, session: AsyncSession, limit: int = 1):
-        query = (
-            select(
-                literal(-3).label("type"),
-                literal(0).label("value"),
-                DomeScheduleData.start_time,
-                DomeScheduleData.end_time,
+        try:
+            query = (
+                select(
+                    literal(-3).label("type"),
+                    literal(0).label("value"),
+                    DomeScheduleData.start_time,
+                    DomeScheduleData.end_time,
+                )
+                .order_by(DomeScheduleData.schedule_id.desc())
+                .limit(limit)
             )
-            .order_by(DomeScheduleData.schedule_id.desc())
-            .limit(limit)
-        )
 
-        result = await session.execute(query)
+            result = await session.execute(query)
+        except Exception as e:
+            query = (
+                select(
+                    literal(-3).label("type"),
+                    literal(0).label("value"),
+                    ColosseumScheduleData.start_time,
+                    ColosseumScheduleData.end_time,
+                )
+                .order_by(ColosseumScheduleData.schedule_id.desc())
+                .limit(limit)
+            )
+            result = await session.execute(query)
         if result := result.fetchall():
             return [
                 CalendarEvent(**dict(zip(CalendarEvent.__annotations__.keys(), item)))
