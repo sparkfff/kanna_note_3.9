@@ -415,9 +415,7 @@ async def draw_birthday(event: BirthdayData):
     return base
 
 
-def get_gacha_event_type(
-    gacha_name: str, description: str, limit_dict: Dict[int, UnitInfo]
-) -> str:
+def get_gacha_event_type(gacha_name: str, limit_dict: Dict[int, UnitInfo]) -> str:
     if gacha_name in {"プリンセスフェス", "公主祭典", "公主庆典"}:
         return "公主庆典", Color.green.value
     if "Anniversary" in gacha_name or "周年" in gacha_name:
@@ -428,7 +426,9 @@ def get_gacha_event_type(
         for unit_info in limit_dict.values()
     }
     type_list = sorted(type_list)
-    if any(keyword in description for keyword in ["復刻", "复刻", "自選"]):
+    if any(keyword in gacha_name for keyword in ["復刻", "复刻", "自選"]) and (
+        "自选精选" not in gacha_name
+    ):
         return "复刻" + "/".join(type_list), Color.gold.value
 
     return "/".join(type_list), Color.orange.value
@@ -441,7 +441,7 @@ async def draw_gacha_event(event: GachaHistoryData, limit_dict: Dict[int, UnitIn
     base = Image.new("RGBA", (WIDTH, height), "#fef8f8")
     draw = ImageDraw.Draw(base)
     font_cn = ImageFont.truetype(FilePath.font_ms_bold.value, 15)
-    type_, color = get_gacha_event_type(event.gacha_name, event.description, limit_dict)
+    type_, color = get_gacha_event_type(event.gacha_name, limit_dict)
     draw_event_banner(
         draw,
         base,

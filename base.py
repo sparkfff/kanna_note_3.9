@@ -79,8 +79,8 @@ SKILL_DESCRIPTIONS = {
     33: "skill_type_33",
     34: "skill_type_34",
     102: "skill_type_34",
-    35: "skill_type_35_43_60_77",
-    101: "skill_type_35_43_60_77",
+    35: "skill_type_35_43_60_77_133",
+    101: "skill_type_35_43_60_77_133",
     36: "skill_type_36_37_38_39_40",
     37: "skill_type_36_37_38_39_40",
     38: "skill_type_36_37_38_39_40",
@@ -88,7 +88,7 @@ SKILL_DESCRIPTIONS = {
     40: "skill_type_36_37_38_39_40",
     41: "none",
     42: "skill_type_42",
-    43: "skill_type_35_43_60_77",
+    43: "skill_type_35_43_60_77_133",
     44: "skill_type_44",
     45: "none",
     46: "skill_type_46",
@@ -105,7 +105,7 @@ SKILL_DESCRIPTIONS = {
     57: "skill_type_57",
     58: "skill_type_58",
     59: "skill_type_59",
-    60: "skill_type_35_43_60_77",
+    60: "skill_type_35_43_60_77_133",
     61: "skill_type_61",
     62: "skill_type_62",
     63: "skill_type_63",
@@ -117,7 +117,7 @@ SKILL_DESCRIPTIONS = {
     74: "none",
     75: "skill_type_75",
     76: "skill_type_76",
-    77: "skill_type_35_43_60_77",
+    77: "skill_type_35_43_60_77_133",
     78: "skill_type_78",
     79: "skill_type_79",
     81: "skill_type_81",
@@ -146,6 +146,8 @@ SKILL_DESCRIPTIONS = {
     123: "skill_action_type_123",
     124: "skill_action_type_124",
     125: "skill_action_type_125",
+    132: "skill_action_type_132",
+    133: "skill_type_35_43_60_77_133",
 }
 
 
@@ -258,6 +260,8 @@ class SkillActionType(Enum):
     BUFF_DOT = 128  # 持续伤害易伤
     DAMAGE_TO_DOT = 129  # 伤害转持续伤害
     CHANGE_DEF_MAX = 130  # 改变防御力上限
+    DAMAGE_CHANGE = 131  # 伤害变更
+    SEAL_CONSUME = 132  # 标记消耗
 
 
 class StringResources(Enum):
@@ -287,7 +291,7 @@ class StringResources(Enum):
     SKILL_TYPE_32 = "HP吸收"
     SKILL_TYPE_33 = "反伤"
     SKILL_TYPE_34 = "伤害递增"
-    SKILL_TYPE_35_43_60_77 = "标记"
+    SKILL_TYPE_35_43_60_77_133 = "标记"
     SKILL_TYPE_36_37_38_39_40 = "领域"
     SKILL_TYPE_42 = "触发"
     SKILL_TYPE_44 = "进场"
@@ -325,8 +329,10 @@ class StringResources(Enum):
     SKILL_ACTION_TYPE_123 = "减伤"
     SKILL_ACTION_TYPE_124 = "转移伤害"
     SKILL_ACTION_TYPE_125 = "无法选中"
-    SKILL_ACTION_TYPE_128 = "持续伤害增强<"
+    SKILL_ACTION_TYPE_128 = "持续伤害增强"
     SKILL_ACTION_TYPE_129 = "伤害转化"
+    SKILL_ACTION_TYPE_130 = "调和"
+    SKILL_ACTION_TYPE_132 = "伤害变更"
     SKILL_STATUS_100 = "无法行动"
     SKILL_STATUS_101 = "加速状态"
     SKILL_STATUS_200 = "失明"
@@ -415,6 +421,7 @@ class StringResources(Enum):
     SKILL_ATK_TEXT = "攻击力"
     SKILL_SPEED = "速度"
     SKILL_HP_MAX = "HP最大值"
+    SKILL_BUFF_EFFECT = "增益效果"
     SKILL_INCREASE = "提升"
     SKILL_REDUCE = "减少"
     SKILL_FIXED = "(固定数值)"
@@ -670,6 +677,10 @@ class StringResources(Enum):
         "使{}受到的 {} 伤害转化为持续伤害{}；该持续伤害不回复 TP"
     )
     SKILL_ACTION_TYPE_DESC_130 = "使{}受到伤害时，按物理/魔法防御中较高的防御计算伤害"
+    SKILL_ACTION_TYPE_DESC_132 = "使{}造成的伤害{}{}{}{}"
+    SKILL_ACTION_TYPE_DESC_133 = (
+        "对{}追加 [{}] 层标记，使用 UB 时，减少 [1] 层标记，并使用动作({}){}"
+    )
     SKILL_ACTION_TAKE_DAMAGE_TP_0 = "，受击时不回复 TP"
     SKILL_ACTION_TAKE_DAMAGE_TP_MULTIPLE = "，受击 TP 变更为初始值的 [{}] 倍"
     SKILL_AILMENT_1 = "减速"
@@ -861,6 +872,7 @@ buff_type_name_duct = {
     17: StringResources.SKILL_MAGIC_DAMAGE_TAKE.value,
     18: StringResources.SKILL_PHYSICAL_DAMAGE.value,
     19: StringResources.SKILL_MAGIC_DAMAGE.value,
+    20: StringResources.SKILL_BUFF.value,
     100: StringResources.SKILL_HP_MAX.value,
 }
 
@@ -887,6 +899,7 @@ class BuffType(Enum):
     MAGIC_DAMAGE_TAKE = 17
     PHYSICAL_DAMAGE = 18
     MAGIC_DAMAGE = 19
+    BUFF = 20
     MAX_HP = 100
 
     @classmethod
