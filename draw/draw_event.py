@@ -435,7 +435,7 @@ def get_gacha_event_type(gacha_name: str, limit_dict: Dict[int, UnitInfo]) -> st
 
 
 async def draw_gacha_event(event: GachaHistoryData, limit_dict: Dict[int, UnitInfo]):
-    unit_ids = event.unit_ids.split("-")
+    unit_ids = event.unit_ids.split("-")[-10:]
     unit_ids_list = split_list(unit_ids, 5)
     height = len(unit_ids_list) * 60 + 65
     base = Image.new("RGBA", (WIDTH, height), "#fef8f8")
